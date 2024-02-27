@@ -6,21 +6,25 @@
 // import axios from "axios";
 import Input from "@/components/shared/Input/Input";
 import Loading from "@/components/shared/Loading/Loading";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/slice/userSlice/userSlice";
+import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
 
 type Inputs = {
-  email: string;
-  password: string;
+  email?: string;
+  pin: string;
+  phone?: number;
 };
 
 const Login = () => {
+  const [loginType, setLoginType] = useState("email");
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const {
     register,
@@ -29,31 +33,38 @@ const Login = () => {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    // setLoading(true);
-    // if (data) {
-    //   axios
-    //     .post("/api/auth/login", {
-    //       email: data.email,
-    //       password: data.password,
-    //     })
-    //     .then((res) => {
-    //       if (res.data.user) {
-    //         SetCookies("user", res.data.user);
-    //         dispatch(setUser(res.data.user));
-    //         setLoading(false);
-    //         router.push("/");
-    //       } else if (res.data.shop) {
-    //         SetCookies("seller", res.data.shop);
-    //         dispatch(setSeller(res.data.shop));
-    //         setLoading(false);
-    //         router.push("/");
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       setLoading(false);
-    //       toast.error(`${err.response.data.message}`);
-    //     });
-    // }
+    setLoading(true);
+    let user;
+    if (loginType == "email") {
+      user = {
+        email: data.email,
+        pin: data.pin,
+      };
+    } else {
+      user = {
+        phone: data.phone,
+        pin: data.pin,
+      };
+    }
+    if (data) {
+      axios
+        .post("/api/auth/login", user)
+        .then((res) => {
+          if (res.data.user) {
+            localStorage.setItem("user", JSON.stringify(res.data.user));
+            dispatch(setUser(res.data.user));
+            setLoading(false);
+            router.push("/");
+          } else if (res.data.shop) {
+            setLoading(false);
+            router.push("/");
+          }
+        })
+        .catch((err) => {
+          setLoading(false);
+          toast.error(`${err.response.data.message}`);
+        });
+    }
   };
   if (loading) {
     return <Loading loading={loading} />;
@@ -66,20 +77,39 @@ const Login = () => {
           <p>
             New member?{" "}
             <Link href="/auth/register" className="text-secondary">
-              Register
+              Register here
             </Link>{" "}
-            here
+          </p>
+        </div>
+        <div className="flex w-full my-3">
+          <p
+            onClick={() => setLoginType("email")}
+            className={`w-1/2 p-4 border-2 shadow-lg rounded-lg cursor-pointer ${
+              loginType == "email" ? "bg-green-500" : ""
+            }`}>
+            Login with email
+          </p>
+          <p
+            onClick={() => setLoginType("phone")}
+            className={`w-1/2 p-4 border-2 shadow-lg rounded-lg cursor-pointer ${
+              loginType == "phone" ? "bg-green-500" : ""
+            }`}>
+            Login with phone
           </p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Input
-            register={register("email")}
-            type="email"
-            placeholder="Enter your email"
+            register={register(loginType === "email" ? "email" : "phone")}
+            type={loginType === "email" ? "email" : "number"}
+            placeholder={
+              loginType === "email"
+                ? "Enter your email"
+                : "Enter your phone number"
+            }
             className="mt-4 w-full"
           />
           <Input
-            register={register("password")}
+            register={register("pin")}
             type="password"
             placeholder="Enter your password"
             className="my-4 w-full"

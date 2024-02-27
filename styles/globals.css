@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.blur-text {
+  filter: blur(4px); /* Adjust the blur amount as needed */
+  cursor: pointer; /* Add a pointer cursor to indicate it's clickable */
+}

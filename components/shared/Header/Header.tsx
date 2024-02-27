@@ -2,8 +2,19 @@ import React from "react";
 import NavLink from "./NavLink";
 import Icon from "../Icon/Icon";
 import { BiUser } from "react-icons/bi";
+import Button from "../Button/Button";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setUser } from "@/redux/slice/userSlice/userSlice";
 
 const Header = () => {
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.userReducer);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    dispatch(setUser(null));
+  };
+
   return (
     <>
       <div className="sticky z-[1100] top-0 bg-green-300 py-3">
@@ -25,18 +36,28 @@ const Header = () => {
         </NavLink> */}
             {/* {!user && !shop ? ( */}
             <>
-              <NavLink
-                className="px-[10px] flex items-center space-x-2 hover:bg-common hover:rounded-lg"
-                route="/auth/login">
+              {!user && (
+                <>
+                  <NavLink
+                    className="px-[10px] flex items-center space-x-2 hover:bg-common hover:rounded-lg"
+                    route="/auth/login">
+                    <BiUser />
+                    <p className="whitespace-nowrap">Sign in</p>
+                  </NavLink>
+                  <NavLink
+                    className="px-[10px] flex items-center space-x-2 hover:bg-common hover:rounded-lg"
+                    route="/auth/register">
+                    <BiUser />
+                    <p className="whitespace-nowrap">Sign up</p>
+                  </NavLink>
+                </>
+              )}
+              <Button
+                onClick={handleLogout}
+                className="px-[10px] flex items-center space-x-2 hover:bg-common hover:rounded-lg">
                 <BiUser />
-                <p className="whitespace-nowrap">Sign in</p>
-              </NavLink>
-              <NavLink
-                className="px-[10px] flex items-center space-x-2 hover:bg-common hover:rounded-lg"
-                route="/auth/register">
-                <BiUser />
-                <p className="whitespace-nowrap">Sign up</p>
-              </NavLink>
+                <p className="whitespace-nowrap">Log Out</p>
+              </Button>
             </>
             {/* ) : ( */}
             {/* <div

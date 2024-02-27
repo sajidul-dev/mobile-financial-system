@@ -1,8 +1,8 @@
 // import { SetCookies } from "@/components/shared/Cookies/Cookies";
 import Input from "@/components/shared/Input/Input";
-import Image from "next/image";
+import Loading from "@/components/shared/Loading/Loading";
 // import { setUser } from "@/redux/slice/userSlice/userSlice";
-// import axios from "axios";
+import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -21,7 +21,6 @@ type Inputs = {
 };
 
 const Signup = () => {
-  const [userImage, setUserImage] = useState<string | null>(null);
   const dispatch = useDispatch();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -33,28 +32,35 @@ const Signup = () => {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    // setLoading(true);
-    // if (data) {
-    //   axios
-    //     .post("/api/auth/register", {
-    //       name: data.name,
-    //       email: data.email,
-    //       password: data.password,
-    //     })
-    //     .then((res) => {
-    //       if (res.data.user) {
-    //         SetCookies("user", res.data.user);
-    //         dispatch(setUser(res.data.user));
-    //         setLoading(false);
-    //         router.push("/");
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       setLoading(false);
-    //       toast.error(`${err.response.data.message}`);
-    //     });
-    // }
+    setLoading(true);
+    if (data) {
+      axios
+        .post("/api/auth/register", {
+          name: data.name,
+          email: data.email,
+          pin: data.pin,
+          phone: data.phone,
+          role: data.role,
+          nid: data.nid,
+        })
+        .then((res) => {
+          if (res.data.user) {
+            // SetCookies("user", res.data.user);
+            // dispatch(setUser(res.data.user));
+            setLoading(false);
+            router.push("/");
+          }
+        })
+        .catch((err) => {
+          setLoading(false);
+          toast.error(`${err.response.data.message}`);
+        });
+    }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="container mx-auto flex flex-col justify-center mt-4">
@@ -64,9 +70,8 @@ const Signup = () => {
           <p>
             Already member?{" "}
             <Link href="/auth/login" className="text-secondary">
-              Login
+              Login here
             </Link>{" "}
-            here
           </p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -92,7 +97,16 @@ const Signup = () => {
             type="number"
             placeholder="Enter your mobile number"
             register={register("phone", {
-              required: { value: true, message: "Mobile numeber is required" },
+              required: { value: true, message: "Mobile number is required" },
+            })}
+            className="my-4 w-full"
+            error={errors?.phone?.message}
+          />
+          <Input
+            type="number"
+            placeholder="Enter your nid number"
+            register={register("nid", {
+              required: { value: true, message: "NID number is required" },
             })}
             className="my-4 w-full"
             error={errors?.phone?.message}
@@ -117,50 +131,12 @@ const Signup = () => {
               required: { value: true, message: "Role is required" },
             })}
             className="block w-full my-4 px-4 py-2 border border-[#86868b] rounded-md focus:outline-none focus:ring focus:border-[#0071e3] placeholder-gray-400">
-            <option value="">Agent</option>
-            <option value="">User</option>
+            <option value="agent">Agent</option>
+            <option value="user">User</option>
           </select>
           {errors?.role?.message && (
             <p className="text-red mt-1.5">{errors?.role?.message}</p>
           )}
-          <label>
-            <div className=" p-4 transition bg-white border border-[#E2E2E2] rounded-md appearance-none cursor-pointer my-4">
-              <div className="py-4">
-                {userImage ? (
-                  <Image
-                    width={300}
-                    height={300}
-                    src={userImage}
-                    alt=""
-                    className="w-full mx-auto"
-                  />
-                ) : (
-                  <Image
-                    width={300}
-                    height={300}
-                    src="/images/sample-nid.webp"
-                    alt="profile"
-                  />
-                )}
-              </div>
-
-              <p className="text-[#7F7F7F] text-sm">
-                Please upload only formats as jpg, jpeg, png.
-              </p>
-              <input
-                type="file"
-                className="hidden"
-                {...register("nid", {
-                  onChange: (e) => {
-                    const url: string = URL.createObjectURL(e.target.files[0]);
-                    setUserImage(url);
-                    // setValue("nid", e.target.files[0]);
-                  },
-                })}
-              />
-              <p className="text-red mt-1.5">{errors?.nid?.message}</p>
-            </div>
-          </label>
 
           <Input
             type="submit"

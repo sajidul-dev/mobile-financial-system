@@ -14,7 +14,7 @@ const userSchema = new Schema({
     required: true,
   },
   pin: {
-    type: Number,
+    type: String,
     required: true,
   },
   role: {
@@ -22,25 +22,13 @@ const userSchema = new Schema({
     required: true,
   },
   nid: {
-    type: String,
+    type: Number,
     required: true,
   },
   balance: {
     type: Number,
     require: true,
   },
-  //   transaction: [
-  //     {
-  //       transactionType: String,
-  //       amount: Number,
-  //     },
-  //   ],
-  //   comments: [
-  //     {
-  //       userId: { type: mongoose.Schema.Types.ObjectId },
-  //       comment: String,
-  //     },
-  //   ],
 });
 
 export const User = models?.User || mongoose.model("User", userSchema);
