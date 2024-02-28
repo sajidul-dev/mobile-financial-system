@@ -1,3 +1,15 @@
+This a mobile fianancial system that is build with NextJS. I have used Node JS, Express JS, MongoDB and Mongoose for the backend and Next JS, TypeScript, Redux for the backend.
+
+Here is my live site [url](https://mobile-financial-system.netlify.app/)
+
+To run this project in your local machine:
+
+Run: yarn install
+
+Run: yarn dev
+
+N.B: Due to my mid term exam examination of last year in B.Sc. I cannot compelete the task properly.
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
